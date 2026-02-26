@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>ANÁLISE ATIVAÇÃO</title>
+    <style>
+        /* Estilos da Interface de Preenchimento (Não saem no PDF) */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; width: 100%; max-width: 650px; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #e31d1a; }
+        h2 { color: #e31d1a; text-align: center; margin-top: 0; text-transform: uppercase; font-size: 18px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 3px; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; background-color: #fff; }
+        textarea { grid-column: span 2; height: 60px; resize: none; }
+        .full { grid-column: span 2; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        button { border: none; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 13px; transition: 0.3s; text-transform: uppercase; }
+        .btn-copy { background: #e31d1a; color: white; }
+        .btn-pdf { background: #333; color: white; }
+        button:hover { opacity: 0.8; }
+        .custom-container { display: none; margin-top: -8px; margin-bottom: 10px; }
+
+        /* AREA DE VISUALIZAÇÃO DO PDF (Oculta na tela) */
+        #print-area { display: none; }
+
+        /* CONFIGURAÇÃO DE IMPRESSÃO (O QUE VAI PARA O PDF) */
+        @media print {
+            @page { margin: 0; }
+            body { background: white; padding: 0; margin: 0; }
+            .card, h2, .grid, .btn-group, label { display: none !important; }
+            #print-area { 
+                display: block !important; 
+                margin: 20px;
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Análise Ativação</h2>
+    <div class="grid">
+        <div class="full">
+            <label>Tipo de Atividade:</label>
+            <select id="ativ" onchange="toggleCustom('ativ', 'ativ_custom_container')">
+                <option value="">Selecione...</option>
+                <option value="Ativação">Ativação</option>
+                <option value="Ativação Portabilidade">Ativação Portabilidade</option>
+                <option value="Migração de Acesso">Migração de Acesso</option>
+                <option value="Mudança Endereço">Mudança Endereço</option>
+                <option value="Mudança Interna">Mudança Interna</option>
+                <option value="Pré-Ativação">Pré-Ativação</option>
+                <option value="Pré-Ativação Portabilidade">Pré-Ativação Portabilidade</option>
+                <option value="custom">Outra (Digitar...)</option>
+            </select>
+            <div id="ativ_custom_container" class="custom-container">
+                <input type="text" id="ativ_custom" placeholder="Qual atividade?">
+            </div>
+        </div>
+
+        <div>
+            <label>Fabricante:</label>
+            <select id="fabricante" onchange="carregarModelos()">
+                <option value="">Selecione...</option>
+                <option value="CISCO">CISCO</option>
+                <option value="HUAWEI">HUAWEI</option>
+                <option value="HP">HP</option>
+                <option value="FORTINET">FORTINET</option>
+                <option value="ALIGERA">ALIGERA</option>
+                <option value="AMPLIMAX">AMPLIMAX</option>
+                <option value="INTELBRAS">INTELBRAS</option>
+                <option value="VELOCLOUD">VELOCLOUD</option>
+                <option value="custom">Outro...</option>
+            </select>
+        </div>
+
+        <div>
+            <label>Modelo:</label>
+            <select id="cpe" onchange="toggleCustom('cpe', 'mod_custom_container')">
+                <option value="">Selecione o fabricante</option>
+            </select>
+            <div id="mod_custom_container" class="custom-container">
+                <input type="text" id="mod_custom" placeholder="Qual modelo?">
+            </div>
+        </div>
+
+        <div><label>NF Transporte:</label><input type="text" id="nft"></div>
+        <div><label>NF Cliente:</label><input type="text" id="nfc"></div>
+        <div><label>Local de Retirada:</label><input type="text" id="local" value="AT LOCAL"></div>
+        
+        <div>
+            <label>Acesso:</label>
+            <select id="acesso" onchange="toggleCustom('acesso', 'acesso_custom_container')">
+                <option value="">Selecione...</option>
+                <option value="EDD">EDD</option>
+                <option value="GPON">GPON</option>
+                <option value="BSOD">BSOD</option>
+                <option value="SDH">SDH</option>
+                <option value="VSAT">VSAT</option>
+                <option value="4G/5G">4G/5G</option>
+                <option value="custom">Outro...</option>
+            </select>
+            <div id="acesso_custom_container" class="custom-container">
+                <input type="text" id="acesso_custom" placeholder="Qual acesso?">
+            </div>
+        </div>
+
+        <div><label>Porta Acesso:</label><input type="text" id="porta"></div>
+        <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
+        <div><label>Cliente Responsável pelo Agendamento:</label><input type="text" id="resp"></div>
+        <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
+    </div>
+    
+    <div class="btn-group">
+        <button class="btn-copy" onclick="gerar('copy')">Copiar HTML</button>
+        <button class="btn-pdf" onclick="gerar('pdf')">Gerar PDF</button>
+    </div>
+</div>
+
+<div id="print-area"></div>
+
+<script>
+const modelosPorFabricante = {
+    "CISCO": ["C841", "C921", "1905", "1941", "2911", "2901", "C1111", "CATALYST C8200L"],
+    "HUAWEI": ["AR651", "AR5710 S8T2XE", "AR5710 H8T2TS1"],
+    "HP": ["MSR930", "MSR954", "MSR10-02", "MSR30-10", "MSR30-12", "MSR30-20", "MSR30-40", "MSR30-64"],
+    "FORTINET": ["FORTIGATE 40F"], "ALIGERA": ["AG561"], "AMPLIMAX": ["EPRL18"], "INTELBRAS": ["5G GX3000"], "VELOCLOUD": ["EDGE 510"]
+};
+
+const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAAB49mBAAAAASFBMVEVHcEze3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t4AAAC9U89UAAAAFnRSTlMA9m+v0m8vX89vbz9/X99vX99vX99vX6E6LgAAAAl0RVh0U29mdHdhcmUAZ2lmMnBuZyDInY67AAAByklEQVR4Ae3Z2XLCMAwFUKYlS9mXpS37//+pDS0lkDRuE8id90yc0fSizpIsSUpKSpKSpKSpKSpKSpKSpKSpKSpKSpLSp6XG7mS702m3W61ms9FoNBr1er1er9fr9Xq/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X/vXU6uVyrUarVajXv9/72fT6Xg8Ho3G49Fos9lsNptOp9Pp9Of5D282m83n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pj+/Xf9/8fH7AfXvA+pfB+ivAnD5F1X/f7f/AAn/AnL8D9VvSpKSkiQlJUlJ6T86AV+NAnf6EAAAAABJRU5ErkJggg==";
+
+function carregarModelos() {
+    const fab = document.getElementById('fabricante').value;
+    const mod = document.getElementById('cpe');
+    mod.innerHTML = '<option value="">Selecione o modelo...</option>';
+    if (fab && modelosPorFabricante[fab]) {
+        modelosPorFabricante[fab].forEach(m => { let o = document.createElement('option'); o.value = m; o.text = m; mod.add(o); });
+    }
+    mod.innerHTML += '<option value="custom">Outro...</option>';
+}
+
+function toggleCustom(selId, contId) {
+    document.getElementById(contId).style.display = document.getElementById(selId).value === 'custom' ? 'block' : 'none';
+}
+
+function gerar(tipo) {
+    const getV = (sId, cId) => document.getElementById(sId).value === 'custom' ? document.getElementById(cId).value : document.getElementById(sId).value;
+    const v = {
+        ativ: getV('ativ', 'ativ_custom'),
+        mod: (document.getElementById('fabricante').value + " " + getV('cpe', 'mod_custom')).trim(),
+        nft: document.getElementById('nft').value,
+        nfc: document.getElementById('nfc').value,
+        loc: document.getElementById('local').value,
+        ace: getV('acesso', 'acesso_custom'),
+        por: document.getElementById('porta').value,
+        cec: document.getElementById('cec').value,
+        res: document.getElementById('resp').value,
+        obs: document.getElementById('obs').value
+    };
+
+    const layoutHTML = `
+    <div style="font-family:sans-serif; color:#e31d1a; background-color:#ffffff; padding:20px; border:5px solid #e31d1a; border-radius:10px; position:relative; min-height:500px;">
+        <b style="font-size:16px; text-transform:uppercase; border-bottom:2px solid #e31d1a; display:block; margin-bottom:10px;">Dados da Atividade:</b>
+        TIPO DE ATIVIDADE: ${v.ativ}<br>
+        ROTEADOR MODELO: ${v.mod}<br>
+        NF TRANSPORTE: ${v.nft}<br>
+        NF CLIENTE: ${v.nfc}<br>
+        LOCAL DE RETIRADA: ${v.loc}<br>
+        ACESSO: ${v.ace}<br>
+        PORTA ACESSO: ${v.por}<br>
+        CEC / CONTATO: ${v.cec}<br>
+        CLIENTE RESPONSÁVEL PELO AGENDAMENTO / CONTATO: ${v.res}<br>
+        OBS: ${v.obs}<br>
+        
+        <hr style="border:0; border-top:2px solid #e31d1a; margin:15px 0;">
+        
+        <b style="font-size:14px; text-transform:uppercase;">Guia de agilidade no atendimento:</b><br><br>
+        
+        <b>1. Dificuldades de Acesso ao Local</b><br>
+        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
+        • Persistência: Acionar CEC responsável.<br><br>
+        
+        <b>2. Divergências no Site Survey</b><br>
+        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
+        
+        <b>3. Suporte e Dúvidas Técnicas</b><br>
+        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
+        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
+        
+        <b>4. Escalonamento Final (Ativação Claro)</b><br>
+          A equipe de Ativação Claro só deve ser acionada em casos excepcionais:<br>
+        • Esgotamento de todas as tratativas descritas acima sem sucesso.<br>
+        • Problemas de rede externa ou bloqueios sistêmicos fora da alçada da parceira/terceiros.
+        
+        <img src="${logoBase64}" style="width:80px; position:absolute; bottom:15px; right:15px;" alt="Logo Claro">
+    </div>`;
+
+    if (tipo === 'copy') {
+        navigator.clipboard.writeText(layoutHTML).then(() => alert("HTML formatado copiado!"));
+    } else {
+        document.getElementById('print-area').innerHTML = layoutHTML.replace('min-height:500px;', 'min-height:90vh;');
+        window.print();
+    }
+}
+</script>
+</body>
+</html>
