@@ -4,30 +4,27 @@
     <meta charset="UTF-8">
     <title>ANÁLISE ATIVAÇÃO</title>
     <style>
-        /* Estilos da Interface de Preenchimento (Não saem no PDF) */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
         .card { background: white; width: 100%; max-width: 650px; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid #e31d1a; }
         h2 { color: #e31d1a; text-align: center; margin-top: 0; text-transform: uppercase; font-size: 18px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 3px; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; background-color: #fff; }
-        textarea { grid-column: span 2; height: 60px; resize: vertical; }
+        textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        button { border: none; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 13px; transition: 0.3s; text-transform: uppercase; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
+        button { border: none; padding: 12px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 11px; transition: 0.3s; text-transform: uppercase; }
         .btn-copy { background: #e31d1a; color: white; }
         .btn-pdf { background: #333; color: white; }
+        .btn-html { background: #555; color: white; }
         button:hover { opacity: 0.8; }
         .custom-container { display: none; margin-top: -8px; margin-bottom: 10px; }
-
-        /* AREA DE VISUALIZAÇÃO DO PDF */
         #print-area { display: none; }
 
         @media print {
-            @page { margin: 1cm; }
-            body { background: white; padding: 0; margin: 0; }
+            body { background: white; padding: 0; }
             .card { display: none !important; }
-            #print-area { display: block !important; margin: 20px; background: white; font-size: 12px; line-height: 1.4; }
+            #print-area { display: block !important; margin: 20px; }
         }
     </style>
 </head>
@@ -49,11 +46,8 @@
                 <option value="Pré-Ativação Portabilidade">Pré-Ativação Portabilidade</option>
                 <option value="custom">Outra (Digitar...)</option>
             </select>
-            <div id="ativ_custom_container" class="custom-container">
-                <input type="text" id="ativ_custom" placeholder="Qual atividade?">
-            </div>
+            <div id="ativ_custom_container" class="custom-container"><input type="text" id="ativ_custom" placeholder="Qual atividade?"></div>
         </div>
-
         <div>
             <label>Fabricante:</label>
             <select id="fabricante" onchange="carregarModelos()">
@@ -62,53 +56,39 @@
                 <option value="HUAWEI">HUAWEI</option>
                 <option value="HP">HP</option>
                 <option value="FORTINET">FORTINET</option>
-                <option value="ALIGERA">ALIGERA</option>
-                <option value="AMPLIMAX">AMPLIMAX</option>
-                <option value="INTELBRAS">INTELBRAS</option>
-                <option value="VELOCLOUD">VELOCLOUD</option>
                 <option value="custom">Outro...</option>
             </select>
         </div>
-
         <div>
             <label>Modelo:</label>
             <select id="cpe" onchange="toggleCustom('cpe', 'mod_custom_container')">
                 <option value="">Selecione o fabricante</option>
             </select>
-            <div id="mod_custom_container" class="custom-container">
-                <input type="text" id="mod_custom" placeholder="Qual modelo?">
-            </div>
+            <div id="mod_custom_container" class="custom-container"><input type="text" id="mod_custom" placeholder="Qual modelo?"></div>
         </div>
-
         <div><label>NF Transporte:</label><input type="text" id="nft"></div>
         <div><label>NF Cliente:</label><input type="text" id="nfc"></div>
         <div><label>Local de Retirada:</label><input type="text" id="local" value="AT LOCAL"></div>
-        
         <div>
             <label>Acesso:</label>
             <select id="acesso" onchange="toggleCustom('acesso', 'acesso_custom_container')">
                 <option value="">Selecione...</option>
                 <option value="EDD">EDD</option>
                 <option value="GPON">GPON</option>
-                <option value="BSOD">BSOD</option>
-                <option value="SDH">SDH</option>
-                <option value="VSAT">VSAT</option>
                 <option value="4G/5G">4G/5G</option>
                 <option value="custom">Outro...</option>
             </select>
-            <div id="acesso_custom_container" class="custom-container">
-                <input type="text" id="acesso_custom" placeholder="Qual acesso?">
-            </div>
+            <div id="acesso_custom_container" class="custom-container"><input type="text" id="acesso_custom" placeholder="Qual acesso?"></div>
         </div>
-
         <div><label>Porta Acesso:</label><input type="text" id="porta"></div>
         <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
-        <div><label>Cliente Responsável pelo Agendamento:</label><input type="text" id="resp"></div>
+        <div><label>Responsável Agendamento:</label><input type="text" id="resp"></div>
         <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
     </div>
     
     <div class="btn-group">
-        <button class="btn-copy" onclick="gerar('copy')">Copiar HTML</button>
+        <button class="btn-copy" onclick="gerar('copy')">Copiar p/ E-mail</button>
+        <button class="btn-html" onclick="gerar('html')">Copiar Código HTML</button>
         <button class="btn-pdf" onclick="gerar('pdf')">Gerar PDF</button>
     </div>
 </div>
@@ -117,83 +97,83 @@
 
 <script>
 const modelosPorFabricante = {
-    "CISCO": ["C841", "C921", "1905", "1941", "2911", "2901", "C1111", "CATALYST C8200L"],
-    "HUAWEI": ["AR651", "AR5710 S8T2XE", "AR5710 H8T2TS1"],
-    "HP": ["MSR930", "MSR954", "MSR10-02", "MSR30-10", "MSR30-12", "MSR30-20", "MSR30-40", "MSR30-64"],
-    "FORTINET": ["FORTIGATE 40F"], "ALIGERA": ["AG561"], "AMPLIMAX": ["EPRL18"], "INTELBRAS": ["5G GX3000"], "VELOCLOUD": ["EDGE 510"]
+    "CISCO": ["C841", "C921", "1905", "1941", "C1111"],
+    "HUAWEI": ["AR651", "AR5710"],
+    "HP": ["MSR930", "MSR954"],
+    "FORTINET": ["FORTIGATE 40F"]
 };
 
 function carregarModelos() {
     const fab = document.getElementById('fabricante').value;
     const mod = document.getElementById('cpe');
-    mod.innerHTML = '<option value="">Selecione o modelo...</option>';
+    mod.innerHTML = '<option value="">Selecione...</option>';
     if (fab && modelosPorFabricante[fab]) {
         modelosPorFabricante[fab].forEach(m => { let o = document.createElement('option'); o.value = m; o.text = m; mod.add(o); });
     }
     mod.innerHTML += '<option value="custom">Outro...</option>';
 }
 
-function toggleCustom(selId, contId) {
-    document.getElementById(contId).style.display = document.getElementById(selId).value === 'custom' ? 'block' : 'none';
+function toggleCustom(idS, idC) {
+    document.getElementById(idC).style.display = document.getElementById(idS).value === 'custom' ? 'block' : 'none';
 }
 
 function gerar(tipo) {
-    const getV = (sId, cId) => {
-        const el = document.getElementById(sId);
-        return el.value === 'custom' ? (document.getElementById(cId).value || 'N/A') : (el.value || 'N/A');
+    const getV = (id, cid) => {
+        const e = document.getElementById(id);
+        return e.value === 'custom' ? (document.getElementById(cid).value || 'N/A') : (e.value || 'N/A');
     };
 
-    // Formatação das observações com quebra de linha
-    const obsBruta = document.getElementById('obs').value;
-    const obsFormatada = obsBruta.replace(/\n/g, '<br>');
+    const obsRaw = document.getElementById('obs').value;
+    const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
-    const layoutHTML = `
-        <div style="font-family: Segoe UI, sans-serif; color: #333;">
-            <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-bottom: 15px;">ANÁLISE ATIVAÇÃO</h2>
-            
-            <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
-            <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
-            <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
-            <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
-            <p><strong>LOCAL DE RETIRADA:</strong> ${document.getElementById('local').value}</p>
-            <p><strong>ACESSO:</strong> ${getV('acesso', 'acesso_custom')} | <strong>PORTA:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
-            <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
-            <p><strong>RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
-            
-            <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
-                <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>
-                <div style="margin-top: 5px; color: #000;">${obsFormatada || 'Nenhuma observação inserida.'}</div>
-            </div>
-
-            <div style="margin-top: 20px; font-size: 11px; color: #e31d1a; border-top: 1px dashed #e31d1a; padding-top: 10px;">
-                <strong>GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br>
-                <strong>1. Dificuldades de Acesso ao Local</strong><br>
-                • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
-                • Persistência: Acionar CEC responsável.<br><br>
-                
-                <strong>2. Divergências no Site Survey</strong><br>
-                • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
-                
-                <strong>3. Suporte e Dúvidas Técnicas</strong><br>
-                • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
-                • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
-                
-                <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
-                A equipe de Ativação Claro só deve ser acionada em casos excepcionais:<br>
-                • Esgotamento de todas as tratativas descritas acima sem sucesso.<br>
-                • Problemas de rede externa ou bloqueios sistêmicos fora da alçada da parceira/terceiros.
-            </div>
-        </div>
-    `;
+    const layout = `
+<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px;">
+    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px;">ANÁLISE ATIVAÇÃO</h2>
+    <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
+    <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
+    <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
+    <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
+    <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value}</p>
+    <p><strong>ACESSO/PORTA:</strong> ${getV('acesso', 'acesso_custom')} | ${document.getElementById('porta').value || 'N/A'}</p>
+    <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
+    <p><strong>RESPONSÁVEL:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+        <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
+    </div>
+    <div style="margin-top: 20px; font-size: 11px; color: #e31d1a; border-top: 1px dashed #e31d1a; padding-top: 10px; line-height: 1.4;">
+        <strong>GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br>
+        <strong>1. Dificuldades de Acesso ao Local</strong><br>
+        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
+        • Persistência: Acionar CEC responsável.<br>
+        <strong>2. Divergências no Site Survey</strong><br>
+        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br>
+        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
+        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
+        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br>
+        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
+        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
+    </div>
+</div>`;
 
     if (tipo === 'pdf') {
-        const area = document.getElementById('print-area');
-        area.innerHTML = layoutHTML;
+        document.getElementById('print-area').innerHTML = layout;
         window.print();
+    } else if (tipo === 'html') {
+        navigator.clipboard.writeText(layout).then(() => alert("Código HTML copiado para o desenvolvedor!"));
     } else {
-        const blob = new Blob([layoutHTML], { type: 'text/html' });
-        const item = new ClipboardItem({ 'text/html': blob });
-        navigator.clipboard.write([item]).then(() => alert('Análise copiada com sucesso!'));
+        // Fallback para cópia formatada (Outlook/Word)
+        const container = document.createElement("div");
+        container.style.position = "fixed";
+        container.style.left = "-9999px";
+        container.innerHTML = layout;
+        document.body.appendChild(container);
+        window.getSelection().removeAllRanges();
+        const range = document.createRange();
+        range.selectNode(container);
+        window.getSelection().addRange(range);
+        document.execCommand("copy");
+        document.body.removeChild(container);
+        alert("Análise formatada copiada! Cole no seu e-mail.");
     }
 }
 </script>
