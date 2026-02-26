@@ -75,6 +75,9 @@
                 <option value="">Selecione...</option>
                 <option value="EDD">EDD</option>
                 <option value="GPON">GPON</option>
+                <option value="BSOD">BSOD</option>
+                <option value="SDH">SDH</option>
+                <option value="VSAT">VSAT</option>
                 <option value="4G/5G">4G/5G</option>
                 <option value="custom">Outro...</option>
             </select>
@@ -129,7 +132,6 @@ function gerar(tipo) {
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
-    // Bloco de Observações (condicional)
     const obsSection = `
     <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
         <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
@@ -167,15 +169,15 @@ function gerar(tipo) {
 </div>`;
 
     if (tipo === 'copy') {
-        const layoutEmail = buildLayout(false); // SEM OBSERVAÇÕES
+        const layoutEmail = buildLayout(false);
         const blob = new Blob([layoutEmail], { type: 'text/html' });
         const data = [new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layoutEmail.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
         navigator.clipboard.write(data).then(() => alert('Formatado para E-mail (sem Observações)!'));
     } else if (tipo === 'html') {
-        const layoutWF = buildLayout(true); // COM OBSERVAÇÕES
+        const layoutWF = buildLayout(true);
         navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado para o WF!'));
     } else if (tipo === 'pdf') {
-        const layoutPDF = buildLayout(true); // COM OBSERVAÇÕES
+        const layoutPDF = buildLayout(true);
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = layoutPDF;
         setTimeout(() => { window.print(); }, 500);
@@ -184,7 +186,3 @@ function gerar(tipo) {
 </script>
 </body>
 </html>
-
-
-
-
