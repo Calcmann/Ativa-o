@@ -136,7 +136,7 @@ function gerar(tipo) {
     <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value}</p>
     <p><strong>ACESSO/PORTA:</strong> ${getV('acesso', 'acesso_custom')} | ${document.getElementById('porta').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
-    <p><strong>RESPONSÁVEL:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
     <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
         <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
     </div>
@@ -179,5 +179,6 @@ function gerar(tipo) {
 </script>
 </body>
 </html>
+
 
 
