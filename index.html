@@ -11,7 +11,7 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 3px; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; background-color: #fff; }
-        textarea { grid-column: span 2; height: 60px; resize: none; }
+        textarea { grid-column: span 2; height: 60px; resize: vertical; }
         .full { grid-column: span 2; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 15px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 13px; transition: 0.3s; text-transform: uppercase; }
@@ -20,19 +20,14 @@
         button:hover { opacity: 0.8; }
         .custom-container { display: none; margin-top: -8px; margin-bottom: 10px; }
 
-        /* AREA DE VISUALIZAÇÃO DO PDF (Oculta na tela) */
+        /* AREA DE VISUALIZAÇÃO DO PDF */
         #print-area { display: none; }
 
-        /* CONFIGURAÇÃO DE IMPRESSÃO (O QUE VAI PARA O PDF) */
         @media print {
-            @page { margin: 0; }
+            @page { margin: 1cm; }
             body { background: white; padding: 0; margin: 0; }
-            .card, h2, .grid, .btn-group, label { display: none !important; }
-            #print-area { 
-                display: block !important; 
-                margin: 20px;
-                background: white;
-            }
+            .card { display: none !important; }
+            #print-area { display: block !important; margin: 20px; background: white; font-size: 12px; line-height: 1.4; }
         }
     </style>
 </head>
@@ -128,8 +123,6 @@ const modelosPorFabricante = {
     "FORTINET": ["FORTIGATE 40F"], "ALIGERA": ["AG561"], "AMPLIMAX": ["EPRL18"], "INTELBRAS": ["5G GX3000"], "VELOCLOUD": ["EDGE 510"]
 };
 
-const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAAB49mBAAAAASFBMVEVHcEze3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t7e3t4AAAC9U89UAAAAFnRSTlMA9m+v0m8vX89vbz9/X99vX99vX99vX6E6LgAAAAl0RVh0U29mdHdhcmUAZ2lmMnBuZyDInY67AAAByklEQVR4Ae3Z2XLCMAwFUKYlS9mXpS37//+pDS0lkDRuE8id90yc0fSizpIsSUpKSpKSpKSpKSpKSpKSpKSpKSpKSpLSp6XG7mS702m3W61ms9FoNBr1er1er9fr9Xq/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X6/X/vXU6uVyrUarVajXv9/72fT6Xg8Ho3G49Fos9lsNptOp9Pp9Of5D282m83n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pp/P5/P5fD6fX+Pz+Xw+n8/n8/l8Pj+/Xf9/8fH7AfXvA+pfB+ivAnD5F1X/f7f/AAn/AnL8D9VvSpKSkiQlJUlJ6T86AV+NAnf6EAAAAABJRU5ErkJggg==";
-
 function carregarModelos() {
     const fab = document.getElementById('fabricante').value;
     const mod = document.getElementById('cpe');
@@ -145,64 +138,65 @@ function toggleCustom(selId, contId) {
 }
 
 function gerar(tipo) {
-    const getV = (sId, cId) => document.getElementById(sId).value === 'custom' ? document.getElementById(cId).value : document.getElementById(sId).value;
-    const v = {
-        ativ: getV('ativ', 'ativ_custom'),
-        mod: (document.getElementById('fabricante').value + " " + getV('cpe', 'mod_custom')).trim(),
-        nft: document.getElementById('nft').value,
-        nfc: document.getElementById('nfc').value,
-        loc: document.getElementById('local').value,
-        ace: getV('acesso', 'acesso_custom'),
-        por: document.getElementById('porta').value,
-        cec: document.getElementById('cec').value,
-        res: document.getElementById('resp').value,
-        obs: document.getElementById('obs').value
+    const getV = (sId, cId) => {
+        const el = document.getElementById(sId);
+        return el.value === 'custom' ? (document.getElementById(cId).value || 'N/A') : (el.value || 'N/A');
     };
 
-    const layoutHTML = `
-    <div style="font-family:sans-serif; color:#e31d1a; background-color:#ffffff; padding:20px; border:5px solid #e31d1a; border-radius:10px; position:relative; min-height:500px;">
-        <b style="font-size:16px; text-transform:uppercase; border-bottom:2px solid #e31d1a; display:block; margin-bottom:10px;">Dados da Atividade:</b>
-        TIPO DE ATIVIDADE: ${v.ativ}<br>
-        ROTEADOR MODELO: ${v.mod}<br>
-        NF TRANSPORTE: ${v.nft}<br>
-        NF CLIENTE: ${v.nfc}<br>
-        LOCAL DE RETIRADA: ${v.loc}<br>
-        ACESSO: ${v.ace}<br>
-        PORTA ACESSO: ${v.por}<br>
-        CEC / CONTATO: ${v.cec}<br>
-        CLIENTE RESPONSÁVEL PELO AGENDAMENTO / CONTATO: ${v.res}<br>
-        OBS: ${v.obs}<br>
-        
-        <hr style="border:0; border-top:2px solid #e31d1a; margin:15px 0;">
-        
-        <b style="font-size:14px; text-transform:uppercase;">Guia de agilidade no atendimento:</b><br><br>
-        
-        <b>1. Dificuldades de Acesso ao Local</b><br>
-        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
-        • Persistência: Acionar CEC responsável.<br><br>
-        
-        <b>2. Divergências no Site Survey</b><br>
-        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
-        
-        <b>3. Suporte e Dúvidas Técnicas</b><br>
-        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
-        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
-        
-        <b>4. Escalonamento Final (Ativação Claro)</b><br>
-          A equipe de Ativação Claro só deve ser acionada em casos excepcionais:<br>
-        • Esgotamento de todas as tratativas descritas acima sem sucesso.<br>
-        • Problemas de rede externa ou bloqueios sistêmicos fora da alçada da parceira/terceiros.
-        
-        <img src="${logoBase64}" style="width:80px; position:absolute; bottom:15px; right:15px;" alt="Logo Claro">
-    </div>`;
+    // Formatação das observações com quebra de linha
+    const obsBruta = document.getElementById('obs').value;
+    const obsFormatada = obsBruta.replace(/\n/g, '<br>');
 
-    if (tipo === 'copy') {
-        navigator.clipboard.writeText(layoutHTML).then(() => alert("HTML formatado copiado!"));
-    } else {
-        document.getElementById('print-area').innerHTML = layoutHTML.replace('min-height:500px;', 'min-height:90vh;');
+    const layoutHTML = `
+        <div style="font-family: Segoe UI, sans-serif; color: #333;">
+            <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-bottom: 15px;">ANÁLISE ATIVAÇÃO</h2>
+            
+            <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
+            <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
+            <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
+            <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
+            <p><strong>LOCAL DE RETIRADA:</strong> ${document.getElementById('local').value}</p>
+            <p><strong>ACESSO:</strong> ${getV('acesso', 'acesso_custom')} | <strong>PORTA:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
+            <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
+            <p><strong>RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+            
+            <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+                <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>
+                <div style="margin-top: 5px; color: #000;">${obsFormatada || 'Nenhuma observação inserida.'}</div>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 11px; color: #e31d1a; border-top: 1px dashed #e31d1a; padding-top: 10px;">
+                <strong>GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br>
+                <strong>1. Dificuldades de Acesso ao Local</strong><br>
+                • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
+                • Persistência: Acionar CEC responsável.<br><br>
+                
+                <strong>2. Divergências no Site Survey</strong><br>
+                • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
+                
+                <strong>3. Suporte e Dúvidas Técnicas</strong><br>
+                • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
+                • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
+                
+                <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
+                A equipe de Ativação Claro só deve ser acionada em casos excepcionais:<br>
+                • Esgotamento de todas as tratativas descritas acima sem sucesso.<br>
+                • Problemas de rede externa ou bloqueios sistêmicos fora da alçada da parceira/terceiros.
+            </div>
+        </div>
+    `;
+
+    if (tipo === 'pdf') {
+        const area = document.getElementById('print-area');
+        area.innerHTML = layoutHTML;
         window.print();
+    } else {
+        const blob = new Blob([layoutHTML], { type: 'text/html' });
+        const item = new ClipboardItem({ 'text/html': blob });
+        navigator.clipboard.write([item]).then(() => alert('Análise copiada com sucesso!'));
     }
 }
 </script>
 </body>
 </html>
+
