@@ -24,7 +24,7 @@
         @media print {
             body { background: white; padding: 0; }
             .card { display: none !important; }
-            #print-area { display: block !important; margin: 20px; }
+            #print-area { display: block !important; margin: 0; width: 100%; }
         }
     </style>
 </head>
@@ -83,6 +83,7 @@
         <div><label>Porta Acesso:</label><input type="text" id="porta"></div>
         <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
         <div><label>Cliente Responsável Agendamento:</label><input type="text" id="resp"></div>
+        <div><label>Contato Cliente Validação:</label><input type="text" id="contato_val"></div>
         <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
     </div>
     
@@ -114,21 +115,44 @@ function carregarModelos() {
 }
 
 function toggleCustom(idS, idC) {
-    document.getElementById(idC).style.display = document.getElementById(idS).value === 'custom' ? 'block' : 'none';
+    const container = document.getElementById(idC);
+    if(container) container.style.display = document.getElementById(idS).value === 'custom' ? 'block' : 'none';
 }
 
 function gerar(tipo) {
     const getV = (id, cid) => {
         const e = document.getElementById(id);
+        if(!e) return 'N/A';
         return e.value === 'custom' ? (document.getElementById(cid).value || 'N/A') : (e.value || 'N/A');
     };
 
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
-    const layout = `
-<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px;">
-    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px;">ANÁLISE ATIVAÇÃO</h2>
+    // Bloco de Observações (condicional)
+    const obsSection = `
+    <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+        <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
+    </div>`;
+
+    const guiaAgilidade = `
+    <div style="margin-top: 20px; font-size: 12px; color: #444; border-top: 1px solid #e31d1a; padding-top: 10px; line-height: 1.4;">
+        <strong style="color: #e31d1a; font-size: 13px;">GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br><br>
+        <strong>1. Dificuldades de Acesso ao Local</strong><br>
+        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
+        • Persistência: Acionar CEC responsável.<br><br>
+        <strong>2. Divergências no Site Survey</strong><br>
+        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
+        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
+        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
+        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
+        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
+        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
+    </div>`;
+
+    const buildLayout = (showObs) => `
+<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px; background: white;">
+    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">ANÁLISE ATIVAÇÃO</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
@@ -137,43 +161,24 @@ function gerar(tipo) {
     <p><strong>ACESSO/PORTA:</strong> ${getV('acesso', 'acesso_custom')} | ${document.getElementById('porta').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
     <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
-    <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
-        <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
-    </div>
-    <div style="margin-top: 20px; font-size: 11px; color: #e31d1a; border-top: 1px dashed #e31d1a; padding-top: 10px; line-height: 1.4;">
-        <strong>GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br>
-        <strong>1. Dificuldades de Acesso ao Local</strong><br>
-        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
-        • Persistência: Acionar CEC responsável.<br>
-        <strong>2. Divergências no Site Survey</strong><br>
-        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br>
-        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
-        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
-        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br>
-        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
-        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
-    </div>
+    <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
+    ${showObs ? obsSection : ''}
+    ${guiaAgilidade}
 </div>`;
 
-    if (tipo === 'pdf') {
-        document.getElementById('print-area').innerHTML = layout;
-        window.print();
+    if (tipo === 'copy') {
+        const layoutEmail = buildLayout(false); // SEM OBSERVAÇÕES
+        const blob = new Blob([layoutEmail], { type: 'text/html' });
+        const data = [new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layoutEmail.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
+        navigator.clipboard.write(data).then(() => alert('Formatado para E-mail (sem Observações)!'));
     } else if (tipo === 'html') {
-        navigator.clipboard.writeText(layout).then(() => alert("Código HTML copiado para o desenvolvedor!"));
-    } else {
-        // Fallback para cópia formatada (Outlook/Word)
-        const container = document.createElement("div");
-        container.style.position = "fixed";
-        container.style.left = "-9999px";
-        container.innerHTML = layout;
-        document.body.appendChild(container);
-        window.getSelection().removeAllRanges();
-        const range = document.createRange();
-        range.selectNode(container);
-        window.getSelection().addRange(range);
-        document.execCommand("copy");
-        document.body.removeChild(container);
-        alert("Análise formatada copiada! Cole no seu e-mail.");
+        const layoutWF = buildLayout(true); // COM OBSERVAÇÕES
+        navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado para o WF!'));
+    } else if (tipo === 'pdf') {
+        const layoutPDF = buildLayout(true); // COM OBSERVAÇÕES
+        const printArea = document.getElementById('print-area');
+        printArea.innerHTML = layoutPDF;
+        setTimeout(() => { window.print(); }, 500);
     }
 }
 </script>
