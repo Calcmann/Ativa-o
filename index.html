@@ -61,7 +61,7 @@
         </div>
 
         <div class="full">
-            <label>Propriedade do Equipamento:</label>
+            <label>Propriedade Roteador:</label>
             <div class="prop-box">
                 <label><input type="radio" name="prop" value="CLARO" checked onchange="toggleCPEFields(false)"> CLARO</label>
                 <label><input type="radio" name="prop" value="CLIENTE" onchange="toggleCPEFields(true)"> CLIENTE</label>
@@ -171,7 +171,7 @@ function gerar(tipo) {
     <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
-    <p><strong>PROPRIEDADE:</strong> ${prop}</p>
+    <p><strong>PROPRIEDADE ROTEADOR:</strong> ${prop}</p>
     ${prop === 'CLARO' ? `
     <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
@@ -180,8 +180,8 @@ function gerar(tipo) {
     <p><strong>TIPO ACESSO:</strong> ${getV('acesso', 'acesso_custom')}</p>
     <p><strong>DESIGNAÇÃO ACESSO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
     <p><strong>PORTA ACESSO:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
-    <p><strong>CONTATO VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
-    <p><strong>RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
+    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
     ${showObs ? `<div style="margin-top:15px;border:1px solid #ddd;padding:10px;background:#f9f9f9;"><strong style="color:#e31d1a;">OBSERVAÇÕES:</strong><br>${obsHTML || 'N/A'}</div>` : ''}
 </div>`;
