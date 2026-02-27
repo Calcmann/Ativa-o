@@ -34,6 +34,10 @@
     <h2>Análise Ativação</h2>
     <div class="grid">
         <div class="full">
+            <label>Designação do Serviço:</label>
+            <input type="text" id="servico_designacao" placeholder="Ex: FNS/IP/01000">
+        </div>
+        <div class="full">
             <label>Tipo de Atividade:</label>
             <select id="ativ" onchange="toggleCustom('ativ', 'ativ_custom_container')">
                 <option value="">Selecione...</option>
@@ -130,6 +134,9 @@ function gerar(tipo) {
         return e.value === 'custom' ? (document.getElementById(cid).value || 'N/A') : (e.value || 'N/A');
     };
 
+    const servicoDesig = document.getElementById('servico_designacao').value || 'S/D';
+    const tituloFormatado = `ANÁLISE ATIVAÇÃO - ${servicoDesig}`;
+
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
@@ -155,14 +162,14 @@ function gerar(tipo) {
 
     const buildLayout = (showObs) => `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px; background: white;">
-    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">ANÁLISE ATIVAÇÃO</h2>
+    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
     <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
     <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value}</p>
     <p><strong>TIPO ACESSO:</strong> ${getV('acesso', 'acesso_custom')}</p>
-    <p><strong>DESIGNAÇÃO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
+    <p><strong>DESIGNAÇÃO ACESSO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
     <p><strong>PORTA ACESSO:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
     <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
     <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
@@ -175,10 +182,10 @@ function gerar(tipo) {
         const layoutEmail = buildLayout(false);
         const blob = new Blob([layoutEmail], { type: 'text/html' });
         const data = [new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layoutEmail.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
-        navigator.clipboard.write(data).then(() => alert('Formatado para E-mail (sem Observações)!'));
+        navigator.clipboard.write(data).then(() => alert('Título: ' + tituloFormatado + '\nCopiado para o E-mail!'));
     } else if (tipo === 'html') {
         const layoutWF = buildLayout(true);
-        navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado para o WF!'));
+        navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado!'));
     } else if (tipo === 'pdf') {
         const layoutPDF = buildLayout(true);
         const printArea = document.getElementById('print-area');
