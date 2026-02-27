@@ -70,7 +70,7 @@
         <div><label>NF Cliente:</label><input type="text" id="nfc"></div>
         <div><label>Local de Retirada:</label><input type="text" id="local" value="AT LOCAL"></div>
         <div>
-            <label>Acesso:</label>
+            <label>Tipo de Acesso:</label>
             <select id="acesso" onchange="toggleCustom('acesso', 'acesso_custom_container')">
                 <option value="">Selecione...</option>
                 <option value="EDD">EDD</option>
@@ -83,10 +83,11 @@
             </select>
             <div id="acesso_custom_container" class="custom-container"><input type="text" id="acesso_custom" placeholder="Qual acesso?"></div>
         </div>
+        <div><label>Designação do Acesso:</label><input type="text" id="desig" placeholder="Ex: DM2104G2_XXXYY-01"></div>
         <div><label>Porta Acesso:</label><input type="text" id="porta"></div>
-        <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
-        <div><label>Cliente Responsável Agendamento:</label><input type="text" id="resp"></div>
         <div><label>Contato Cliente Validação:</label><input type="text" id="contato_val"></div>
+        <div><label>Cliente Responsável Agendamento:</label><input type="text" id="resp"></div>
+        <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
         <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
     </div>
     
@@ -160,10 +161,12 @@ function gerar(tipo) {
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
     <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
     <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value}</p>
-    <p><strong>ACESSO/PORTA:</strong> ${getV('acesso', 'acesso_custom')} | ${document.getElementById('porta').value || 'N/A'}</p>
-    <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
-    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>TIPO ACESSO:</strong> ${getV('acesso', 'acesso_custom')}</p>
+    <p><strong>DESIGNAÇÃO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
+    <p><strong>PORTA ACESSO:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
     <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
+    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
     ${showObs ? obsSection : ''}
     ${guiaAgilidade}
 </div>`;
@@ -177,13 +180,10 @@ function gerar(tipo) {
         const layoutWF = buildLayout(true);
         navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado para o WF!'));
     } else if (tipo === 'pdf') {
-        // CORREÇÃO: Alimenta o print-area e chama window.print()
         const layoutPDF = buildLayout(true);
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = layoutPDF;
-        setTimeout(() => { 
-            window.print(); 
-        }, 500);
+        setTimeout(() => { window.print(); }, 500);
     }
 }
 </script>
