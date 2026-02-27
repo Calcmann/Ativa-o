@@ -13,8 +13,15 @@
         input:disabled, select:disabled { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
         textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
-        .prop-box { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; }
+        
+        /* Ajuste na Prop Box e Cores Dinâmicas */
+        .prop-box { padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; transition: 0.3s; }
         .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; font-size: 13px; }
+        .bg-claro { background-color: #e31d1a !important; border-color: #b31412 !important; }
+        .bg-claro label { color: white !important; }
+        .bg-cliente { background-color: #f8f9fa !important; border-color: #ddd !important; }
+        .bg-cliente label { color: #333 !important; }
+
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 12px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 11px; transition: 0.3s; text-transform: uppercase; }
         .btn-copy { background: #e31d1a; color: white; }
@@ -62,7 +69,7 @@
 
         <div class="full">
             <label>Propriedade do Equipamento:</label>
-            <div class="prop-box">
+            <div class="prop-box bg-claro">
                 <label><input type="radio" name="prop" value="CLARO" checked onchange="toggleCPEFields(false)"> CLARO</label>
                 <label><input type="radio" name="prop" value="CLIENTE" onchange="toggleCPEFields(true)"> CLIENTE</label>
             </div>
@@ -130,6 +137,17 @@ const modelosPorFabricante = {
 
 function toggleCPEFields(disable) {
     const ids = ['fabricante', 'cpe', 'nft', 'nfc', 'local'];
+    const propBox = document.querySelector('.prop-box');
+
+    // Alternância de cores da caixa
+    if (disable) {
+        propBox.classList.remove('bg-claro');
+        propBox.classList.add('bg-cliente');
+    } else {
+        propBox.classList.remove('bg-cliente');
+        propBox.classList.add('bg-claro');
+    }
+
     ids.forEach(id => {
         const el = document.getElementById(id);
         el.disabled = disable;
