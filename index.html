@@ -10,8 +10,11 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         label { display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 3px; text-transform: uppercase; }
         input, select, textarea { width: 100%; padding: 8px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 13px; background-color: #fff; }
+        input:disabled, select:disabled { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
         textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
+        .prop-box { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; }
+        .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 12px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 11px; transition: 0.3s; text-transform: uppercase; }
         .btn-copy { background: #e31d1a; color: white; }
@@ -35,7 +38,7 @@
     <div class="grid">
         <div class="full">
             <label>Designação do Serviço:</label>
-            <input type="text" id="servico_designacao" placeholder="Ex: FNS/IP/01000">
+            <input type="text" id="servico_designacao" placeholder="Ex: VPN_CLIENTE_XYZ">
         </div>
         <div class="full">
             <label>Tipo de Atividade:</label>
@@ -52,6 +55,19 @@
             </select>
             <div id="ativ_custom_container" class="custom-container"><input type="text" id="ativ_custom" placeholder="Qual atividade?"></div>
         </div>
+        <div class="full">
+            <label>OS - Ordem de Serviço - CPE:</label>
+            <input type="text" id="os_cpe" placeholder="Digite o número da OS">
+        </div>
+
+        <div class="full">
+            <label>Propriedade do Equipamento:</label>
+            <div class="prop-box">
+                <label><input type="radio" name="prop" value="CLARO" checked onchange="toggleCPEFields(false)"> CLARO</label>
+                <label><input type="radio" name="prop" value="CLIENTE" onchange="toggleCPEFields(true)"> CLIENTE</label>
+            </div>
+        </div>
+
         <div>
             <label>Fabricante:</label>
             <select id="fabricante" onchange="carregarModelos()">
@@ -112,6 +128,16 @@ const modelosPorFabricante = {
     "FORTINET": ["FORTIGATE 40F"]
 };
 
+function toggleCPEFields(disable) {
+    const ids = ['fabricante', 'cpe', 'nft', 'nfc', 'local'];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.disabled = disable;
+        if(disable) el.value = '';
+    });
+    if(disable) document.getElementById('mod_custom_container').style.display = 'none';
+}
+
 function carregarModelos() {
     const fab = document.getElementById('fabricante').value;
     const mod = document.getElementById('cpe');
@@ -130,66 +156,45 @@ function toggleCustom(idS, idC) {
 function gerar(tipo) {
     const getV = (id, cid) => {
         const e = document.getElementById(id);
-        if(!e) return 'N/A';
+        if(!e || e.disabled) return 'N/A';
         return e.value === 'custom' ? (document.getElementById(cid).value || 'N/A') : (e.value || 'N/A');
     };
 
+    const prop = document.querySelector('input[name="prop"]:checked').value;
     const servicoDesig = document.getElementById('servico_designacao').value || 'S/D';
     const tituloFormatado = `ANÁLISE ATIVAÇÃO - ${servicoDesig}`;
-
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
-
-    const obsSection = `
-    <div style="margin-top: 15px; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
-        <strong style="color: #e31d1a;">OBSERVAÇÕES ADICIONAIS:</strong><br>${obsHTML || 'N/A'}
-    </div>`;
-
-    const guiaAgilidade = `
-    <div style="margin-top: 20px; font-size: 12px; color: #444; border-top: 1px solid #e31d1a; padding-top: 10px; line-height: 1.4;">
-        <strong style="color: #e31d1a; font-size: 13px;">GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br><br>
-        <strong>1. Dificuldades de Acesso ao Local</strong><br>
-        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
-        • Persistência: Acionar CEC responsável.<br><br>
-        <strong>2. Divergências no Site Survey</strong><br>
-        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
-        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
-        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
-        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
-        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
-        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
-    </div>`;
 
     const buildLayout = (showObs) => `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px; background: white;">
     <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
+    <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
+    <p><strong>PROPRIEDADE:</strong> ${prop}</p>
+    ${prop === 'CLARO' ? `
     <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
     <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
-    <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value}</p>
+    <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value || 'N/A'}</p>` : ''}
     <p><strong>TIPO ACESSO:</strong> ${getV('acesso', 'acesso_custom')}</p>
     <p><strong>DESIGNAÇÃO ACESSO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
     <p><strong>PORTA ACESSO:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
-    <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
-    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>CONTATO VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
+    <p><strong>RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
-    ${showObs ? obsSection : ''}
-    ${guiaAgilidade}
+    ${showObs ? `<div style="margin-top:15px;border:1px solid #ddd;padding:10px;background:#f9f9f9;"><strong style="color:#e31d1a;">OBSERVAÇÕES:</strong><br>${obsHTML || 'N/A'}</div>` : ''}
 </div>`;
 
     if (tipo === 'copy') {
         const layoutEmail = buildLayout(false);
         const blob = new Blob([layoutEmail], { type: 'text/html' });
         const data = [new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layoutEmail.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
-        navigator.clipboard.write(data).then(() => alert('Título: ' + tituloFormatado + '\nCopiado para o E-mail!'));
+        navigator.clipboard.write(data).then(() => alert('Copiado para o E-mail!'));
     } else if (tipo === 'html') {
-        const layoutWF = buildLayout(true);
-        navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado!'));
+        navigator.clipboard.writeText(buildLayout(true)).then(() => alert('Código HTML copiado!'));
     } else if (tipo === 'pdf') {
-        const layoutPDF = buildLayout(true);
-        const printArea = document.getElementById('print-area');
-        printArea.innerHTML = layoutPDF;
+        document.getElementById('print-area').innerHTML = buildLayout(true);
         setTimeout(() => { window.print(); }, 500);
     }
 }
