@@ -14,7 +14,6 @@
         textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
         
-        /* Ajuste na Prop Box e Cores Dinâmicas */
         .prop-box { padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; transition: 0.3s; }
         .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; font-size: 13px; }
         .bg-claro { background-color: #e31d1a !important; border-color: #b31412 !important; }
@@ -34,7 +33,7 @@
         @media print {
             body { background: white; padding: 0; }
             .card { display: none !important; }
-            #print-area { display: block !important; margin: 0; width: 100%; }
+            #print-area { display: block !important; margin: 40px 0 0 0; width: 100%; }
         }
     </style>
 </head>
@@ -139,7 +138,6 @@ function toggleCPEFields(disable) {
     const ids = ['fabricante', 'cpe', 'nft', 'nfc', 'local'];
     const propBox = document.querySelector('.prop-box');
 
-    // Alternância de cores da caixa
     if (disable) {
         propBox.classList.remove('bg-claro');
         propBox.classList.add('bg-cliente');
@@ -179,8 +177,8 @@ function gerar(tipo) {
     };
 
     const prop = document.querySelector('input[name="prop"]:checked').value;
-    const servicoDesig = document.getElementById('servico_designacao').value || 'S/D';
-    const tituloFormatado = `ANÁLISE ATIVAÇÃO - ${servicoDesig}`;
+    const desigServ = document.getElementById('servico_designacao').value.trim();
+    const tituloFormatado = desigServ ? `ANÁLISE ATIVAÇÃO - ${desigServ}` : `ANÁLISE ATIVAÇÃO`;
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
@@ -200,7 +198,8 @@ function gerar(tipo) {
     </div>`;
 
     const buildLayout = (showObs) => `
-<div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px; background: white;">
+<div style="position: relative; font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; background: white; margin-top: 50px; margin-left: auto; margin-right: auto;">
+    <img src="logo.png" alt="Logo" style="position: absolute; top: -65px; right: -5px; width: 90px; height: auto; z-index: 999;"><br><br>
     <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
@@ -228,8 +227,17 @@ function gerar(tipo) {
     } else if (tipo === 'html') {
         navigator.clipboard.writeText(buildLayout(true)).then(() => alert('Código HTML copiado!'));
     } else if (tipo === 'pdf') {
-        document.getElementById('print-area').innerHTML = buildLayout(true);
-        setTimeout(() => { window.print(); }, 500);
+        const printArea = document.getElementById('print-area');
+        printArea.innerHTML = buildLayout(true);
+        
+        const nomeSugerido = tituloFormatado.replace(/[/\\?%*:|"<>]/g, '-');
+        const tituloOriginal = document.title;
+        document.title = nomeSugerido;
+
+        setTimeout(() => { 
+            window.print(); 
+            document.title = tituloOriginal;
+        }, 500);
     }
 }
 </script>
