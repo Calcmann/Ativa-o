@@ -177,10 +177,13 @@ function gerar(tipo) {
         const layoutWF = buildLayout(true);
         navigator.clipboard.writeText(layoutWF).then(() => alert('Código HTML copiado para o WF!'));
     } else if (tipo === 'pdf') {
+        // CORREÇÃO: Alimenta o print-area e chama window.print()
         const layoutPDF = buildLayout(true);
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = layoutPDF;
-        setTimeout(() => { window.print(); }, 500);
+        setTimeout(() => { 
+            window.print(); 
+        }, 500);
     }
 }
 </script>
