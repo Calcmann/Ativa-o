@@ -14,7 +14,7 @@
         textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
         .prop-box { background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; }
-        .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+        .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; font-size: 13px; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 12px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 11px; transition: 0.3s; text-transform: uppercase; }
         .btn-copy { background: #e31d1a; color: white; }
@@ -61,7 +61,7 @@
         </div>
 
         <div class="full">
-            <label>Propriedade Roteador:</label>
+            <label>Propriedade do Equipamento:</label>
             <div class="prop-box">
                 <label><input type="radio" name="prop" value="CLARO" checked onchange="toggleCPEFields(false)"> CLARO</label>
                 <label><input type="radio" name="prop" value="CLIENTE" onchange="toggleCPEFields(true)"> CLIENTE</label>
@@ -166,12 +166,27 @@ function gerar(tipo) {
     const obsRaw = document.getElementById('obs').value;
     const obsHTML = obsRaw.replace(/\n/g, '<br>');
 
+    const guiaAgilidade = `
+    <div style="margin-top: 20px; font-size: 12px; color: #444; border-top: 1px solid #e31d1a; padding-top: 10px; line-height: 1.4;">
+        <strong style="color: #e31d1a; font-size: 13px;">GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br><br>
+        <strong>1. Dificuldades de Acesso ao Local</strong><br>
+        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
+        • Persistência: Acionar CEC responsável.<br><br>
+        <strong>2. Divergências no Site Survey</strong><br>
+        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
+        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
+        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
+        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
+        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
+        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
+    </div>`;
+
     const buildLayout = (showObs) => `
 <div style="font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; border: 1px solid #eee; padding: 20px; background: white;">
     <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
-    <p><strong>PROPRIEDADE ROTEADOR:</strong> ${prop}</p>
+    <p><strong>PROPRIEDADE:</strong> ${prop}</p>
     ${prop === 'CLARO' ? `
     <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
@@ -180,10 +195,11 @@ function gerar(tipo) {
     <p><strong>TIPO ACESSO:</strong> ${getV('acesso', 'acesso_custom')}</p>
     <p><strong>DESIGNAÇÃO ACESSO:</strong> ${document.getElementById('desig').value || 'N/A'}</p>
     <p><strong>PORTA ACESSO:</strong> ${document.getElementById('porta').value || 'N/A'}</p>
-    <p><strong>CONTATO CLIENTE VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
-    <p><strong>CLIENTE RESP. AGENDAMENTO:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
+    <p><strong>CONTATO VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
+    <p><strong>CLIENTE RESP. AGENDA:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
     ${showObs ? `<div style="margin-top:15px;border:1px solid #ddd;padding:10px;background:#f9f9f9;"><strong style="color:#e31d1a;">OBSERVAÇÕES:</strong><br>${obsHTML || 'N/A'}</div>` : ''}
+    ${guiaAgilidade}
 </div>`;
 
     if (tipo === 'copy') {
