@@ -83,6 +83,7 @@
                 <option value="HUAWEI">HUAWEI</option>
                 <option value="HP">HP</option>
                 <option value="FORTINET">FORTINET</option>
+                <option value="ALIGERA">ALIGERA</option>
                 <option value="custom">Outro...</option>
             </select>
         </div>
@@ -134,7 +135,8 @@ const modelosPorFabricante = {
     "CISCO": ["C841", "C921", "1905", "1941", "C1111"],
     "HUAWEI": ["AR651", "AR5710"],
     "HP": ["MSR930", "MSR954"],
-    "FORTINET": ["FORTIGATE 40F"]
+    "FORTINET": ["FORTIGATE 40F"],
+    "ALIGERA": ["AG561"]
 };
 
 function limpar() {
@@ -247,17 +249,13 @@ function gerar(tipo) {
         const tituloOriginal = document.title;
         document.title = nomeSugerido;
 
-        // Pequeno delay para garantir que o DOM renderize o conteúdo de impressão
         setTimeout(() => { 
             window.print(); 
             document.title = tituloOriginal;
-            printArea.innerHTML = ''; // Limpa após imprimir para permitir novas gerações
+            printArea.innerHTML = '';
         }, 400);
     }
 }
 </script>
 </body>
 </html>
-
-
-
