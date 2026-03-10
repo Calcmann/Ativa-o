@@ -34,7 +34,7 @@
         @media print {
             body { background: white; padding: 0; }
             .card { display: none !important; }
-            #print-area { display: block !important; margin: 40px 0 0 0; width: 100%; }
+            #print-area { display: block !important; margin: 0; width: 100%; }
         }
     </style>
 </head>
@@ -151,8 +151,8 @@ function toggleCPEFields(disable) {
         propBox.classList.remove('bg-claro');
         propBox.classList.add('bg-cliente');
     } else {
-        propBox.classList.remove('bg-cliente');
         propBox.classList.add('bg-claro');
+        propBox.classList.remove('bg-cliente');
     }
 
     ids.forEach(id => {
@@ -208,7 +208,7 @@ function gerar(tipo) {
     </div>`;
 
     const buildLayout = (showExtra) => `
-<div style="position: relative; font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; background: white; margin-top: 50px; margin-left: auto; margin-right: auto; text-align: justify;">
+<div style="position: relative; font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; background: white; padding: 20px; margin-left: auto; margin-right: auto; text-align: justify;">
     <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
@@ -242,13 +242,22 @@ function gerar(tipo) {
     } else if (tipo === 'pdf') {
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = buildLayout(true);
+        
         const nomeSugerido = tituloFormatado.replace(/[/\\?%*:|"<>]/g, '-');
         const tituloOriginal = document.title;
         document.title = nomeSugerido;
-        setTimeout(() => { window.print(); document.title = tituloOriginal; }, 500);
+
+        // Pequeno delay para garantir que o DOM renderize o conteúdo de impressão
+        setTimeout(() => { 
+            window.print(); 
+            document.title = tituloOriginal;
+            printArea.innerHTML = ''; // Limpa após imprimir para permitir novas gerações
+        }, 400);
     }
 }
 </script>
 </body>
 </html>
+
+
 
