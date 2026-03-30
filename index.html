@@ -13,14 +13,12 @@
         input:disabled, select:disabled { background-color: #e9ecef; cursor: not-allowed; color: #6c757d; }
         textarea { grid-column: span 2; height: 80px; resize: vertical; }
         .full { grid-column: span 2; }
-        
         .prop-box { padding: 10px; border-radius: 6px; border: 1px solid #ddd; margin-bottom: 10px; display: flex; gap: 20px; align-items: center; transition: 0.3s; }
         .prop-box label { margin-bottom: 0; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; text-transform: none; font-size: 13px; }
         .bg-claro { background-color: #e31d1a !important; border-color: #b31412 !important; }
         .bg-claro label { color: white !important; }
         .bg-cliente { background-color: #f8f9fa !important; border-color: #ddd !important; }
         .bg-cliente label { color: #333 !important; }
-
         .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         button { border: none; padding: 12px; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 11px; transition: 0.3s; text-transform: uppercase; }
         .btn-copy { background: #e31d1a; color: white; }
@@ -30,7 +28,6 @@
         button:hover { opacity: 0.8; }
         .custom-container { display: none; margin-top: -8px; margin-bottom: 10px; }
         #print-area { display: none; }
-
         @media print {
             body { background: white; padding: 0; }
             .card { display: none !important; }
@@ -68,7 +65,6 @@
             <label>Ordem de Serviço - OS CPE:</label>
             <input type="text" id="os_cpe" placeholder="Digite o número da OS">
         </div>
-
         <div class="full">
             <label>Propriedade do Equipamento:</label>
             <div class="prop-box bg-claro">
@@ -76,7 +72,6 @@
                 <label><input type="radio" name="prop" value="CLIENTE" onchange="toggleCPEFields(true)"> CLIENTE</label>
             </div>
         </div>
-
         <div>
             <label>Fabricante:</label>
             <select id="fabricante" onchange="carregarModelos()">
@@ -88,6 +83,7 @@
                 <option value="HUAWEI">HUAWEI</option>
                 <option value="custom">Outro...</option>
             </select>
+            <div id="fab_custom_container" class="custom-container"><input type="text" id="fab_custom" placeholder="Qual fabricante?"></div>
         </div>
         <div>
             <label>Modelo:</label>
@@ -109,7 +105,7 @@
                 <option value="SDH">SDH</option>
                 <option value="VSAT">VSAT</option>
                 <option value="4G/5G">4G/5G</option>
-                <option value="4G/5G">TERCEIRO</option>
+                <option value="TERCEIRO">TERCEIRO</option>
                 <option value="custom">Outro...</option>
             </select>
             <div id="acesso_custom_container" class="custom-container"><input type="text" id="acesso_custom" placeholder="Qual acesso?"></div>
@@ -122,7 +118,6 @@
         <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
         <div class="full"><label>Ficha SAIP:</label><textarea id="saip"></textarea></div>
     </div>
-    
     <div class="btn-group">
         <button class="btn-copy" onclick="gerar('copy')">Copiar p/ E-mail</button>
         <button class="btn-html" onclick="gerar('html')">Copiar Código HTML P/ WF</button>
@@ -130,7 +125,6 @@
         <button class="btn-clear" onclick="limpar()">Limpar Formulário</button>
     </div>
 </div>
-
 <div id="print-area"></div>
 
 <script>
@@ -143,39 +137,50 @@ const modelosPorFabricante = {
 };
 
 function limpar() {
-    if(confirm("Deseja realmente limpar todos os campos?")) {
-        window.location.reload();
-    }
+    if(confirm("Deseja realmente limpar todos os campos?")) { window.location.reload(); }
 }
 
 function toggleCPEFields(disable) {
     const ids = ['fabricante', 'cpe', 'nft', 'nfc', 'local'];
     const propBox = document.querySelector('.prop-box');
-
     if (disable) {
-        propBox.classList.remove('bg-claro');
-        propBox.classList.add('bg-cliente');
+        propBox.classList.remove('bg-claro'); propBox.classList.add('bg-cliente');
     } else {
-        propBox.classList.add('bg-claro');
-        propBox.classList.remove('bg-cliente');
+        propBox.classList.add('bg-claro'); propBox.classList.remove('bg-cliente');
     }
-
     ids.forEach(id => {
         const el = document.getElementById(id);
         el.disabled = disable;
         if(disable) el.value = '';
     });
-    if(disable) document.getElementById('mod_custom_container').style.display = 'none';
+    if(disable) {
+        document.getElementById('mod_custom_container').style.display = 'none';
+        document.getElementById('fab_custom_container').style.display = 'none';
+    }
 }
 
 function carregarModelos() {
     const fab = document.getElementById('fabricante').value;
     const mod = document.getElementById('cpe');
+    const fabCont = document.getElementById('fab_custom_container');
+    const modCont = document.getElementById('mod_custom_container');
+    
     mod.innerHTML = '<option value="">Selecione...</option>';
+    fabCont.style.display = (fab === 'custom') ? 'block' : 'none';
+
+    if (fab === 'custom') {
+        mod.innerHTML = '<option value="custom" selected>Outro...</option>';
+        modCont.style.display = 'block';
+        return;
+    }
+
     if (fab && modelosPorFabricante[fab]) {
-        modelosPorFabricante[fab].forEach(m => { let o = document.createElement('option'); o.value = m; o.text = m; mod.add(o); });
+        modelosPorFabricante[fab].forEach(m => { 
+            let o = document.createElement('option'); o.value = m; o.text = m; mod.add(o); 
+        });
     }
     mod.innerHTML += '<option value="custom">Outro...</option>';
+    modCont.style.display = 'none';
 }
 
 function toggleCustom(idS, idC) {
@@ -187,39 +192,27 @@ function gerar(tipo) {
     const getV = (id, cid) => {
         const e = document.getElementById(id);
         if(!e || e.disabled) return 'N/A';
-        return e.value === 'custom' ? (document.getElementById(cid).value || 'N/A') : (e.value || 'N/A');
+        if (e.value === 'custom') {
+            const extra = cid ? document.getElementById(cid) : null;
+            return (extra && extra.value.trim() !== "") ? extra.value : 'OUTRO';
+        }
+        return (e.value || 'N/A');
     };
 
     const prop = document.querySelector('input[name="prop"]:checked').value;
     const desigServ = document.getElementById('servico_designacao').value.trim();
     const tituloFormatado = desigServ ? `ANÁLISE ATIVAÇÃO - ${desigServ}` : `ANÁLISE ATIVAÇÃO`;
-    
     const obsHTML = document.getElementById('obs').value.replace(/\n/g, '<br>');
     const saipHTML = document.getElementById('saip').value.replace(/\n/g, '<br>');
 
-    const guiaAgilidade = `
-    <div style="margin-top: 20px; font-size: 12px; color: #444; border-top: 1px solid #e31d1a; padding-top: 10px; line-height: 1.4; text-align: justify;">
-        <strong style="color: #e31d1a; font-size: 13px;">GUIA DE AGILIDADE NO ATENDIMENTO:</strong><br><br>
-        <strong>1. Dificuldades de Acesso ao Local</strong><br>
-        • Impedimento: Contatar o CLIENTE responsável pelo agendamento.<br>
-        • Persistência: Acionar CEC responsável.<br><br>
-        <strong>2. Divergências no Site Survey</strong><br>
-        • Ação obrigatória: Reportar erro de CPE diretamente ao CEC para correção.<br><br>
-        <strong>3. Suporte e Dúvidas Técnicas</strong><br>
-        • Fluxo interno: Acionar primeiro o Supervisor/Suporte da Parceira.<br>
-        • Acessos de Terceiros: Acionar o suporte do respectivo provedor.<br><br>
-        <strong>4. Escalonamento Final (Ativação Claro)</strong><br>
-        A equipe de Ativação Claro só deve ser acionada em casos excepcionais.
-    </div>`;
-
     const buildLayout = (showExtra) => `
-<div style="position: relative; font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; background: white; padding: 20px; margin-left: auto; margin-right: auto; text-align: justify;">
-    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px; margin-top: 0;">${tituloFormatado}</h2>
+<div style="position: relative; font-family: 'Segoe UI', Arial, sans-serif; color: #333; max-width: 600px; background: white; padding: 20px; margin-left: auto; margin-right: auto;">
+    <h2 style="color: #e31d1a; text-align: center; border-bottom: 2px solid #e31d1a; padding-bottom: 10px;">${tituloFormatado}</h2>
     <p><strong>ATIVIDADE:</strong> ${getV('ativ', 'ativ_custom')}</p>
     <p><strong>OS - CPE:</strong> ${document.getElementById('os_cpe').value || 'N/A'}</p>
     <p><strong>PROPRIEDADE:</strong> ${prop}</p>
     ${prop === 'CLARO' ? `
-    <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', '')} - ${getV('cpe', 'mod_custom')}</p>
+    <p><strong>EQUIPAMENTO:</strong> ${getV('fabricante', 'fab_custom')} - ${getV('cpe', 'mod_custom')}</p>
     <p><strong>NF TRANSPORTE:</strong> ${document.getElementById('nft').value || 'N/A'}</p>
     <p><strong>NF CLIENTE:</strong> ${document.getElementById('nfc').value || 'N/A'}</p>
     <p><strong>LOCAL RETIRADA:</strong> ${document.getElementById('local').value || 'N/A'}</p>` : ''}
@@ -229,40 +222,25 @@ function gerar(tipo) {
     <p><strong>CONTATO VALIDAÇÃO:</strong> ${document.getElementById('contato_val').value || 'N/A'}</p>
     <p><strong>CLIENTE RESP. AGENDA:</strong> ${document.getElementById('resp').value || 'N/A'}</p>
     <p><strong>CEC/CONTATO:</strong> ${document.getElementById('cec').value || 'N/A'}</p>
-    ${showExtra ? `
-        <div style="margin-top:15px;border:1px solid #ddd;padding:10px;background:#f9f9f9;">
-            <strong style="color:#e31d1a;">OBSERVAÇÕES:</strong><br>${obsHTML || 'N/A'}<br><br>
-            <strong style="color:#e31d1a;">FICHA SAIP:</strong><br>${saipHTML || 'N/A'}
-        </div>` : ''}
-    ${guiaAgilidade}
+    ${showExtra ? `<div style="margin-top:15px;border:1px solid #ddd;padding:10px;background:#f9f9f9;"><strong style="color:#e31d1a;">OBSERVAÇÕES:</strong><br>${obsHTML || 'N/A'}<br><br><strong style="color:#e31d1a;">FICHA SAIP:</strong><br>${saipHTML || 'N/A'}</div>` : ''}
 </div>`;
 
-    if (tipo === 'copy') {
-        const layoutEmail = buildLayout(false);
-        const blob = new Blob([layoutEmail], { type: 'text/html' });
-        const data = [new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layoutEmail.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
-        navigator.clipboard.write(data).then(() => alert('Copiado para o E-mail!'));
-    } else if (tipo === 'html') {
-        navigator.clipboard.writeText(buildLayout(true)).then(() => alert('Código HTML copiado!'));
-    } else if (tipo === 'pdf') {
+    if (tipo === 'pdf') {
         const printArea = document.getElementById('print-area');
         printArea.innerHTML = buildLayout(true);
-        
-        const nomeSugerido = tituloFormatado.replace(/[/\\?%*:|"<>]/g, '-');
-        const tituloOriginal = document.title;
-        document.title = nomeSugerido;
-
-        setTimeout(() => { 
-            window.print(); 
-            document.title = tituloOriginal;
-            printArea.innerHTML = '';
-        }, 400);
+        const originalTitle = document.title;
+        document.title = tituloFormatado.replace(/[/\\?%*:|"<>]/g, '-');
+        setTimeout(() => { window.print(); document.title = originalTitle; printArea.innerHTML = ''; }, 400);
+    } else {
+        const layout = buildLayout(tipo === 'html');
+        if (tipo === 'copy') {
+            const blob = new Blob([layout], { type: 'text/html' });
+            navigator.clipboard.write([new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layout.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })]).then(() => alert('Copiado!'));
+        } else {
+            navigator.clipboard.writeText(layout).then(() => alert('HTML Copiado!'));
+        }
     }
 }
 </script>
 </body>
 </html>
-
-
-
-
