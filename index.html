@@ -112,15 +112,15 @@
         </div>
         <div><label>Designação do Acesso:</label><input type="text" id="desig" placeholder="Ex: DM2104G2_XXXYY-01"></div>
         <div><label>Porta Acesso:</label><input type="text" id="porta"></div>
-        <div><label>Contato Cliente Validação:</label><input type="text" id="contato_val"></div>
-        <div><label>Cliente Responsável Agendamento:</label><input type="text" id="resp"></div>
+        <div><label>Contato Validação:</label><input type="text" id="contato_val"></div>
+        <div><label>Responsável Agendamento:</label><input type="text" id="resp"></div>
         <div><label>CEC / Contato:</label><input type="text" id="cec"></div>
         <div class="full"><label>Observações Adicionais:</label><textarea id="obs"></textarea></div>
         <div class="full"><label>Ficha SAIP:</label><textarea id="saip"></textarea></div>
     </div>
     <div class="btn-group">
         <button class="btn-copy" onclick="gerar('copy')">Copiar p/ E-mail</button>
-        <button class="btn-html" onclick="gerar('html')">Copiar Código HTML P/ WF</button>
+        <button class="btn-html" onclick="gerar('html')">Código HTML P/ WF</button>
         <button class="btn-pdf" onclick="gerar('pdf')">Gerar PDF</button>
         <button class="btn-clear" onclick="limpar()">Limpar Formulário</button>
     </div>
@@ -134,6 +134,19 @@ const modelosPorFabricante = {
     "HUAWEI": ["AR651", "AR5710"],
     "HP": ["MSR930", "MSR954", "MSR10-02"],
     "FORTINET": ["FORTIGATE 40F","FORTIGATE 60F","FORTIGATE 61F", "FORTIGATE 80F", "FORTIGATE 100F"],
+};
+
+// CAPTURA AUTOMÁTICA DA URL (SGP -> TOOL)
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+    const idSGP = params.get('id');
+    const desigSGP = params.get('desig');
+
+    if (idSGP || desigSGP) {
+        if (desigSGP) document.getElementById('servico_designacao').value = decodeURIComponent(desigSGP);
+        if (idSGP) document.getElementById('obs').value = `Origem SGP: ${idSGP}\n` + document.getElementById('obs').value;
+        console.log("Dados importados do SGP!");
+    }
 };
 
 function limpar() {
@@ -150,8 +163,10 @@ function toggleCPEFields(disable) {
     }
     ids.forEach(id => {
         const el = document.getElementById(id);
-        el.disabled = disable;
-        if(disable) el.value = '';
+        if(el) {
+            el.disabled = disable;
+            if(disable) el.value = '';
+        }
     });
     if(disable) {
         document.getElementById('mod_custom_container').style.display = 'none';
@@ -235,9 +250,9 @@ function gerar(tipo) {
         const layout = buildLayout(tipo === 'html');
         if (tipo === 'copy') {
             const blob = new Blob([layout], { type: 'text/html' });
-            navigator.clipboard.write([new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layout.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })]).then(() => alert('Copiado!'));
+            navigator.clipboard.write([new ClipboardItem({ 'text/html': blob, 'text/plain': new Blob([layout.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })]).then(() => alert('Copiado para o E-mail!'));
         } else {
-            navigator.clipboard.writeText(layout).then(() => alert('HTML Copiado!'));
+            navigator.clipboard.writeText(layout).then(() => alert('Código HTML Copiado!'));
         }
     }
 }
