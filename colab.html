@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISTA DE COLABORADORES - PLANILHA COMPLETA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: white;
+            padding: 25px 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 3px solid #2a7de1;
+            padding-bottom: 15px;
+            margin-bottom: 18px;
+        }
+        h1 {
+            color: #1a3b5d;
+            font-weight: 700;
+            font-size: 26px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #e8edf5;
+            color: #1a3b5d;
+            white-space: nowrap;
+        }
+        .btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .btn-primary { background: #1a3b5d; color: white; }
+        .btn-primary:hover { background: #2a5a8a; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #2ecc71; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-warning:hover { background: #f1c40f; }
+        .btn-info { background: #2980b9; color: white; }
+        .btn-info:hover { background: #3498db; }
+        .btn-incluir { background: #2ecc71; color: white; font-size: 14px; padding: 8px 20px; }
+        .btn-incluir:hover { background: #27ae60; }
+        .btn-email { background: #8e44ad; color: white; }
+        .btn-email:hover { background: #9b59b6; }
+
+        .subtitle {
+            color: #4a6f8f;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            margin: 10px 0 18px 0;
+            padding: 12px 18px;
+            background: #f8faff;
+            border-radius: 12px;
+            border: 2px solid #dde7f0;
+            align-items: center;
+        }
+        .filtros-label {
+            font-weight: 700;
+            color: #1a3b5d;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .filtro-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #1a3b5d;
+            cursor: pointer;
+            padding: 3px 8px 3px 4px;
+            border-radius: 16px;
+            transition: 0.2s;
+        }
+        .filtro-item:hover {
+            background: rgba(42, 125, 225, 0.08);
+        }
+        .filtro-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #1a3b5d;
+        }
+        .filtros-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        }
+        .filtros-actions .btn {
+            font-size: 11px;
+            padding: 5px 12px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 2px solid #dde7f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            background: white;
+            min-width: 800px;
+        }
+        th {
+            background: #1a3b5d;
+            color: white;
+            font-weight: 700;
+            padding: 12px 8px;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            border-right: 1px solid #2a5a7a;
+        }
+        th:last-child { border-right: none; }
+        th.acao-col {
+            width: 70px;
+            text-align: center;
+        }
+
+        td {
+            padding: 8px 8px;
+            border-bottom: 1px solid #dde7f0;
+            border-right: 1px solid #eaf0f6;
+            vertical-align: middle;
+            text-transform: uppercase;
+            font-weight: 500;
+            font-size: 12px;
+            outline: none;
+            cursor: text;
+            min-height: 38px;
+            transition: background 0.15s;
+        }
+        td:last-child { border-right: none; }
+        td:focus {
+            background: #fffde7 !important;
+            box-shadow: inset 0 0 0 2px #2a7de1;
+            border-radius: 2px;
+        }
+        td:hover {
+            filter: brightness(0.97);
+        }
+
+        /* CORES POR CM - SEMPRE VISÍVEIS */
+        .cm-criciuma { background-color: #e3f2fd; }
+        .cm-criciuma td { background-color: #e3f2fd; }
+
+        .cm-forianopolis { background-color: #e8f5e9; }
+        .cm-forianopolis td { background-color: #e8f5e9; }
+
+        .cm-itajai { background-color: #fff3e0; }
+        .cm-itajai td { background-color: #fff3e0; }
+
+        .cm-blumenau { background-color: #fce4ec; }
+        .cm-blumenau td { background-color: #fce4ec; }
+
+        .cm-joinville { background-color: #f3e5f5; }
+        .cm-joinville td { background-color: #f3e5f5; }
+
+        .cm-chapeco { background-color: #e0f7fa; }
+        .cm-chapeco td { background-color: #e0f7fa; }
+
+        .cm-videira { background-color: #fff8e1; }
+        .cm-videira td { background-color: #fff8e1; }
+
+        .cm-novo { background-color: #f5f5f5; }
+        .cm-novo td { background-color: #f5f5f5; }
+
+        /* LINHA SELECIONADA */
+        .linha-selecionada td {
+            box-shadow: inset 0 0 0 3px #1a3b5d !important;
+            background-color: #c5d9f0 !important;
+            font-weight: 700;
+        }
+        .linha-selecionada td:first-child::before {
+            content: "✓ ";
+            color: #1a3b5d;
+            font-weight: 900;
+        }
+
+        .highlight-empty {
+            color: #999;
+            font-style: italic;
+        }
+
+        .btn-remover-linha {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-remover-linha:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            font-size: 12px;
+            color: #5a6f82;
+            text-align: right;
+            border-top: 1px solid #dde7f0;
+            padding-top: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .contador-selecionados {
+            font-weight: 700;
+            color: #1a3b5d;
+            background: #e8edf5;
+            padding: 3px 14px;
+            border-radius: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a3b5d;
+            color: white;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.3s ease;
+            z-index: 999;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: white;
+            padding: 30px 35px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        .modal h2 {
+            color: #1a3b5d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            font-size: 20px;
+        }
+        .modal label {
+            display: block;
+            font-weight: 600;
+            margin: 10px 0 4px;
+            font-size: 13px;
+            text-transform: uppercase;
+            color: #1a3b5d;
+        }
+        .modal select, .modal input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #dde7f0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+        .modal-actions .btn {
+            padding: 10px 24px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            th, td { padding: 5px 4px; font-size: 10px; }
+            .header { flex-direction: column; align-items: stretch; }
+            .btn { font-size: 10px; padding: 5px 10px; }
+            .filtros { gap: 6px 10px; padding: 8px 10px; }
+            .filtro-item { font-size: 10px; }
+            .filtros-actions { margin-left: 0; width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>📋 COLABORADORES</h1>
+        <div class="toolbar">
+            <button class="btn btn-incluir" onclick="abrirModalIncluir()">➕ INCLUIR</button>
+            <button class="btn btn-success" onclick="copiarSelecionados()">📋 COPIAR</button>
+            <button class="btn btn-warning" onclick="exportarSelecionadosCSV()">📊 CSV</button>
+            <button class="btn btn-email" onclick="copiarSelecionadosEmail()">📧 E-MAIL</button>
+            <button class="btn btn-info" onclick="salvarAlteracoes()">💾 SALVAR</button>
+        </div>
+    </div>
+
+    <div class="subtitle">🔹 CLIQUE EM QUALQUER CÉLULA PARA EDITAR · MARQUE OS CHECKBOXES PARA SELECIONAR LINHAS</div>
+
+    <div class="filtros" id="filtrosContainer">
+        <span class="filtros-label">📍 CM:</span>
+        <div class="filtros-actions">
+            <button class="btn btn-primary" onclick="selecionarTodos()">✔ TODOS</button>
+            <button class="btn btn-danger" onclick="limparSelecao()">✕ LIMPAR</button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="tabelaColaboradores">
+            <thead>
+                <tr>
+                    <th>UNIDADE</th>
+                    <th>NOME COMPLETO</th>
+                    <th>CPF</th>
+                    <th>RG</th>
+                    <th>EMPRESA</th>
+                    <th>TELEFONE</th>
+                    <th>PLACA</th>
+                    <th class="acao-col">AÇÃO</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabela">
+                <!-- Dados injetados via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <span>TOTAL: <span id="totalColaboradores">0</span> COLABORADORES</span>
+        <span>🔹 <span id="contadorSelecionados" class="contador-selecionados">0</span> SELECIONADOS</span>
+        <span>DADOS INTERNOS · ATUALIZADO EM 2026</span>
+    </div>
+
+</div>
+
+<!-- MODAL INCLUIR -->
+<div class="modal-overlay" id="modalIncluir">
+    <div class="modal">
+        <h2>➕ INCLUIR COLABORADOR</h2>
+        <label>UNIDADE (CM)</label>
+        <select id="selectCM">
+            <option value="CM CRICIÚMA - CUA">CRICIÚMA</option>
+            <option value="CM FORIANÓPOLIS - FNS">FORIANÓPOLIS</option>
+            <option value="CM ITAJAÍ - IAI">ITAJAÍ</option>
+            <option value="CM BLUMENAU - BNU">BLUMENAU</option>
+            <option value="CM JOINVILLE - JVE">JOINVILLE</option>
+            <option value="CM CHAPECÓ - CCO">CHAPECÓ</option>
+            <option value="CM VIDEIRA / LAGES - VII - LGS">VIDEIRA / LAGES</option>
+        </select>
+        <label>NOME COMPLETO *</label>
+        <input type="text" id="inputNome" placeholder="Digite o nome completo">
+        <label>CPF</label>
+        <input type="text" id="inputCPF" placeholder="Apenas números">
+        <label>RG</label>
+        <input type="text" id="inputRG" placeholder="Número do RG">
+        <label>EMPRESA</label>
+        <input type="text" id="inputEmpresa" placeholder="Ex: SINOS TELECOM">
+        <label>TELEFONE</label>
+        <input type="text" id="inputTelefone" placeholder="Ex: 48 9 9999-9999">
+        <label>PLACA</label>
+        <input type="text" id="inputPlaca" placeholder="Ex: ABC 1234">
+        <div class="modal-actions">
+            <button class="btn" onclick="fecharModalIncluir()">CANCELAR</button>
+            <button class="btn btn-success" onclick="incluirLinha()">✅ INCLUIR</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">✅ SALVO!</div>
+
+<script>
+    // ============================================================
+    // DADOS
+    // ============================================================
+    let dados = [
+        ["CM CRICIÚMA - CUA", "SAMUEL HENRIQUE SILVA", "03395102939", "4137648", "SINOS TELECOM", "48 9 9152 6251", ""],
+        ["CM CRICIÚMA - CUA", "JEAN CARLOS SANTOS DE ALMEIDA", "02914461917", "40754618", "CLARO", "48 98844-0148", ""],
+        ["CM CRICIÚMA - CUA", "JEFFERSON TYSKA DE MORAES", "82041466049", "4085979931", "CLARO", "48 98804-1160", ""],
+        ["CM FORIANÓPOLIS - FNS", "LUCAS RATIER MOREIRA", "73415600106", "1627249", "SINOS TELECOM", "48 9812-5397", ""],
+        ["CM FORIANÓPOLIS - FNS", "EVERSON FERREIRA FAGUNDES", "05604275140", "7920338", "SINOS TELECOM", "48 9 9957 5693", "PWS 3475"],
+        ["CM ITAJAÍ - IAI", "LUIZ CARLOS BENTO DA SILVA", "05898947906", "90830066", "SINOS TELECOM", "47 9 9650 2815", ""],
+        ["CM ITAJAÍ - IAI", "CLAUDINEI DOROW", "510969941", "3977828", "SINOS TELECOM", "47 9 9136 4940", ""],
+        ["CM ITAJAÍ - IAI", "JAMES MAURO LENZI", "68458568934", "2271114", "SINOS TELECOM", "47 9 9266 4010", ""],
+        ["CM ITAJAÍ - IAI", "EVERSON FERREIRA FAGUNDES", "05604275140", "7920338", "SINOS TELECOM", "48 9 9957 5693", ""],
+        ["CM ITAJAÍ - IAI", "SEZINALDO VARGAS", "80542972972", "57017848", "SINOS TELECOM", "47 9 9631 3524", ""],
+        ["CM BLUMENAU - BNU", "CLAUDINEI DOROW", "510969941", "3977828", "SINOS TELECOM", "47 9 9136 4940", ""],
+        ["CM BLUMENAU - BNU", "SEZINALDO VARGAS", "80542972972", "57017848", "SINOS TELECOM", "47 9 9631 3524", ""],
+        ["CM JOINVILLE - JVE", "JAMES MAURO LENZI", "68458568934", "2271114", "SINOS TELECOM", "47 9 9266 4010", ""],
+        ["CM JOINVILLE - JVE", "SEZINALDO VARGAS", "80542972972", "57017848", "SINOS TELECOM", "47 9 9631 3524", ""],
+        ["CM CHAPECÓ - CCO", "LUCAS RATIER MOREIRA", "73415600106", "1627249", "SINOS TELECOM", "48 9812-5397", ""],
+        ["CM CHAPECÓ - CCO", "ANDRE LUIS SEVERO DIAS", "93625081091", "3017248869", "CLARO", "49 98803-0123", ""],
+        ["CM CHAPECÓ - CCO", "JOSE VOLMIR PAVAO", "82703523904", "2544878", "CLARO", "49 98863-2386", ""],
+        ["CM VIDEIRA / LAGES - VII - LGS", "SANDRO VARLEI BORGES ANCINI", "57504750000", "6037192512", "CLARO", "49 98807-8685", ""],
+        ["CM VIDEIRA / LAGES - VII - LGS", "GILSON OMAR DE OLIVEIRA", "60585030006", "1015035593", "CLARO", "49 98835-3356", ""]
+    ];
+
+    // ============================================================
+    // FUNÇÕES AUXILIARES
+    // ============================================================
+    function getClasseCM(unidade) {
+        if (unidade.includes("CRICIÚMA")) return "cm-criciuma";
+        if (unidade.includes("FORIANÓPOLIS")) return "cm-forianopolis";
+        if (unidade.includes("ITAJAÍ")) return "cm-itajai";
+        if (unidade.includes("BLUMENAU")) return "cm-blumenau";
+        if (unidade.includes("JOINVILLE")) return "cm-joinville";
+        if (unidade.includes("CHAPECÓ")) return "cm-chapeco";
+        if (unidade.includes("VIDEIRA") || unidade.includes("LAGES")) return "cm-videira";
+        return "";
+    }
+
+    function getNomeCM(unidade) {
+        if (unidade.includes("CRICIÚMA")) return "CRICIÚMA";
+        if (unidade.includes("FORIANÓPOLIS")) return "FORIANÓPOLIS";
+        if (unidade.includes("ITAJAÍ")) return "ITAJAÍ";
+        if (unidade.includes("BLUMENAU")) return "BLUMENAU";
+        if (unidade.includes("JOINVILLE")) return "JOINVILLE";
+        if (unidade.includes("CHAPECÓ")) return "CHAPECÓ";
+        if (unidade.includes("VIDEIRA") || unidade.includes("LAGES")) return "VIDEIRA";
+        return "";
+    }
+
+    let selecaoAtiva = new Set();
+
+    // ============================================================
+    // RENDERIZAÇÃO
+    // ============================================================
+    function renderizarTabela() {
+        const tbody = document.getElementById("corpoTabela");
+        tbody.innerHTML = "";
+        dados.forEach((linha, index) => {
+            const tr = document.createElement("tr");
+            const classeCM = getClasseCM(linha[0]);
+            if (classeCM) {
+                tr.className = classeCM;
+            }
+
+            const nomeCM = getNomeCM(linha[0]);
+            if (selecaoAtiva.has(nomeCM)) {
+                tr.classList.add("linha-selecionada");
+            }
+
+            linha.forEach((celula, colIndex) => {
+                const td = document.createElement("td");
+                td.contentEditable = true;
+                td.textContent = celula || "—";
+                if (celula === "") {
+                    td.className = "highlight-empty";
+                }
+                td.addEventListener("focus", function() {
+                    if (this.textContent === "—") {
+                        this.textContent = "";
+                        this.className = "";
+                    }
+                });
+                td.addEventListener("blur", function() {
+                    if (this.textContent.trim() === "") {
+                        this.textContent = "—";
+                        this.className = "highlight-empty";
+                    }
+                    const row = this.parentElement;
+                    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+                    const colIndex = Array.from(this.parentElement.children).indexOf(this);
+                    if (dados[rowIndex]) {
+                        const val = this.textContent.trim() === "—" ? "" : this.textContent.trim();
+                        dados[rowIndex][colIndex] = val;
+                    }
+                });
+                tr.appendChild(td);
+            });
+
+            // Coluna de ação (remover)
+            const tdAcao = document.createElement("td");
+            tdAcao.style.textAlign = "center";
+            tdAcao.style.verticalAlign = "middle";
+            tdAcao.style.backgroundColor = "transparent";
+            const btnRemover = document.createElement("button");
+            btnRemover.className = "btn-remover-linha";
+            btnRemover.textContent = "✕";
+            btnRemover.title = "Remover esta linha";
+            btnRemover.onclick = function(e) {
+                e.stopPropagation();
+                if (confirm("Remover este colaborador permanentemente?")) {
+                    removerLinha(index);
+                }
+            };
+            tdAcao.appendChild(btnRemover);
+            tr.appendChild(tdAcao);
+
+            tbody.appendChild(tr);
+        });
+        document.getElementById("totalColaboradores").textContent = dados.length;
+        atualizarContador();
+    }
+
+    function renderizarCheckboxes() {
+        const container = document.getElementById("filtrosContainer");
+        const itensAntigos = container.querySelectorAll(".filtro-item");
+        itensAntigos.forEach(el => el.remove());
+
+        const cmsUnicos = new Set();
+        dados.forEach(linha => {
+            const nome = getNomeCM(linha[0]);
+            if (nome) cmsUnicos.add(nome);
+        });
+
+        const ref = container.querySelector(".filtros-actions");
+        const sortedCMs = Array.from(cmsUnicos).sort();
+        sortedCMs.forEach(nomeCM => {
+            const div = document.createElement("div");
+            div.className = "filtro-item";
+
+            const cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.id = "cb_" + nomeCM;
+            cb.checked = selecaoAtiva.has(nomeCM);
+            cb.addEventListener("change", function() {
+                if (this.checked) {
+                    selecaoAtiva.add(nomeCM);
+                } else {
+                    selecaoAtiva.delete(nomeCM);
+                }
+                renderizarTabela();
+                atualizarCheckboxes();
+            });
+
+            const label = document.createElement("label");
+            label.htmlFor = "cb_" + nomeCM;
+            label.textContent = nomeCM;
+
+            div.appendChild(cb);
+            div.appendChild(label);
+            container.insertBefore(div, ref);
+        });
+    }
+
+    function atualizarCheckboxes() {
+        document.querySelectorAll('.filtro-item input[type="checkbox"]').forEach(cb => {
+            const nome = cb.id.replace("cb_", "");
+            cb.checked = selecaoAtiva.has(nome);
+        });
+        atualizarContador();
+    }
+
+    function atualizarContador() {
+        const selecionados = document.querySelectorAll('.linha-selecionada').length;
+        document.getElementById("contadorSelecionados").textContent = selecionados;
+    }
+
+    // ============================================================
+    // AÇÕES
+    // ============================================================
+
+    function selecionarTodos() {
+        document.querySelectorAll('.filtro-item input[type="checkbox"]').forEach(cb => {
+            const nome = cb.id.replace("cb_", "");
+            selecaoAtiva.add(nome);
+        });
+        renderizarTabela();
+        atualizarCheckboxes();
+    }
+
+    function limparSelecao() {
+        selecaoAtiva.clear();
+        renderizarTabela();
+        atualizarCheckboxes();
+    }
+
+    function getLinhasSelecionadas() {
+        const linhas = document.querySelectorAll('#corpoTabela tr.linha-selecionada');
+        const dadosSelecionados = [];
+        linhas.forEach(tr => {
+            const celulas = tr.querySelectorAll('td');
+            const linhaDados = [];
+            celulas.forEach((td, idx) => {
+                if (idx < celulas.length - 1) {
+                    let val = td.textContent.trim();
+                    linhaDados.push(val === "—" ? "" : val);
+                }
+            });
+            dadosSelecionados.push(linhaDados);
+        });
+        return dadosSelecionados;
+    }
+
+    // ============================================================
+    // COPIAR SELECIONADOS (TEXTO)
+    // ============================================================
+    function copiarSelecionados() {
+        const selecionados = getLinhasSelecionadas();
+        if (selecionados.length === 0) {
+            alert("⚠️ Nenhum colaborador selecionado! Marque os checkboxes dos CMs desejados.");
+            return;
+        }
+
+        const headers = ["UNIDADE", "NOME COMPLETO", "CPF", "RG", "EMPRESA", "TELEFONE", "PLACA"];
+        let texto = headers.join("\t") + "\n";
+        selecionados.forEach(linha => {
+            texto += linha.join("\t") + "\n";
+        });
+
+        navigator.clipboard.writeText(texto).then(() => {
+            mostrarToast("📋 " + selecionados.length + " colaboradores copiados com cabeçalho!");
+        }).catch(() => {
+            const textarea = document.createElement("textarea");
+            textarea.value = texto;
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            textarea.style.top = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand("copy");
+                mostrarToast("📋 " + selecionados.length + " colaboradores copiados com cabeçalho!");
+            } catch (err) {
+                alert("Não foi possível copiar. Selecione os dados manualmente.");
+            }
+            document.body.removeChild(textarea);
+        });
+    }
+
+    // ============================================================
+    // EXPORTAR CSV
+    // ============================================================
+    function exportarSelecionadosCSV() {
+        const selecionados = getLinhasSelecionadas();
+        if (selecionados.length === 0) {
+            alert("⚠️ Nenhum colaborador selecionado! Marque os checkboxes dos CMs desejados.");
+            return;
+        }
+
+        const headers = ["UNIDADE", "NOME COMPLETO", "CPF", "RG", "EMPRESA", "TELEFONE", "PLACA"];
+        let csv = headers.join(";") + "\n";
+        selecionados.forEach(linha => {
+            const linhaLimpa = linha.map(item => item.replace(/;/g, ","));
+            csv += linhaLimpa.join(";") + "\n";
+        });
+
+        const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "colaboradores_selecionados_" + new Date().toISOString().slice(0,10) + ".csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        mostrarToast("📊 CSV com " + selecionados.length + " colaboradores exportado!");
+    }
+
+    // ============================================================
+    // COPIAR SELECIONADOS PARA E-MAIL (SOMENTE TABELA)
+    // ============================================================
+    function copiarSelecionadosEmail() {
+        const selecionados = getLinhasSelecionadas();
+        if (selecionados.length === 0) {
+            alert("⚠️ Nenhum colaborador selecionado! Marque os checkboxes dos CMs desejados.");
+            return;
+        }
+
+        const headers = ["UNIDADE", "NOME COMPLETO", "CPF", "RG", "EMPRESA", "TELEFONE", "PLACA"];
+
+        // Monta tabela HTML para e-mail - SOMENTE OS DADOS
+        let htmlTabela = `
+            <table style="width:100%; border-collapse:collapse; font-family:'Segoe UI',Tahoma,Arial,sans-serif; font-size:13px; border-radius:8px; overflow:hidden; border:1px solid #dde7f0;">
+                <thead>
+                    <tr>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">UNIDADE</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">NOME COMPLETO</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">CPF</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">RG</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">EMPRESA</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">TELEFONE</th>
+                        <th style="background:#1a3b5d; color:#ffffff; font-weight:700; padding:12px 12px; text-align:left; text-transform:uppercase; font-size:11px; letter-spacing:0.5px; border:1px solid #2a4a6a;">PLACA</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        selecionados.forEach(linha => {
+            const unidade = linha[0] || "";
+            let corFundo = "#ffffff";
+            if (unidade.includes("CRICIÚMA")) corFundo = "#eaf3fc";
+            else if (unidade.includes("FORIANÓPOLIS")) corFundo = "#edf7ee";
+            else if (unidade.includes("ITAJAÍ")) corFundo = "#fef5ea";
+            else if (unidade.includes("BLUMENAU")) corFundo = "#fdeff2";
+            else if (unidade.includes("JOINVILLE")) corFundo = "#f5eff8";
+            else if (unidade.includes("CHAPECÓ")) corFundo = "#e8f6f9";
+            else if (unidade.includes("VIDEIRA") || unidade.includes("LAGES")) corFundo = "#fef9e8";
+
+            htmlTabela += `<tr>`;
+            linha.forEach(val => {
+                htmlTabela += `<td style="padding:10px 12px; border:1px solid #e0e6ed; vertical-align:middle; text-transform:uppercase; font-weight:500; font-size:12px; background-color:${corFundo};">${val || "—"}</td>`;
+            });
+            htmlTabela += `</tr>`;
+        });
+
+        htmlTabela += `
+                </tbody>
+            </table>
+        `;
+
+        // Copia para área de transferência
+        const blob = new Blob([htmlTabela], { type: 'text/html' });
+        const item = new ClipboardItem({
+            'text/html': blob,
+            'text/plain': new Blob([
+                headers.join("\t") + "\n" +
+                selecionados.map(row => row.join("\t")).join("\n")
+            ], { type: 'text/plain' })
+        });
+
+        navigator.clipboard.write([item]).then(() => {
+            mostrarToast("📧 " + selecionados.length + " colaboradores copiados para E-MAIL!");
+        }).catch(() => {
+            // Fallback
+            const textarea = document.createElement("textarea");
+            textarea.value = headers.join("\t") + "\n" + 
+                selecionados.map(row => row.join("\t")).join("\n");
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand("copy");
+                mostrarToast("📧 " + selecionados.length + " colaboradores copiados!");
+            } catch (err) {
+                alert("Não foi possível copiar. Selecione os dados manualmente.");
+            }
+            document.body.removeChild(textarea);
+        });
+    }
+
+    // ============================================================
+    // SALVAR ALTERAÇÕES
+    // ============================================================
+    function salvarAlteracoes() {
+        const linhas = document.querySelectorAll('#corpoTabela tr');
+        const novosDados = [];
+        linhas.forEach(tr => {
+            const celulas = tr.querySelectorAll('td');
+            const linhaDados = [];
+            celulas.forEach((td, idx) => {
+                if (idx < celulas.length - 1) {
+                    let val = td.textContent.trim();
+                    linhaDados.push(val === "—" ? "" : val);
+                }
+            });
+            if (linhaDados.length > 0) {
+                novosDados.push(linhaDados);
+            }
+        });
+        dados = novosDados;
+        renderizarCheckboxes();
+        renderizarTabela();
+        mostrarToast("💾 Alterações salvas com sucesso!");
+    }
+
+    // ============================================================
+    // REMOVER LINHA
+    // ============================================================
+    function removerLinha(index) {
+        dados.splice(index, 1);
+        renderizarCheckboxes();
+        renderizarTabela();
+        mostrarToast("🗑️ Linha removida!");
+    }
+
+    // ============================================================
+    // INCLUIR LINHA
+    // ============================================================
+    function abrirModalIncluir() {
+        document.getElementById("modalIncluir").classList.add("active");
+        document.getElementById("inputNome").value = "";
+        document.getElementById("inputCPF").value = "";
+        document.getElementById("inputRG").value = "";
+        document.getElementById("inputEmpresa").value = "";
+        document.getElementById("inputTelefone").value = "";
+        document.getElementById("inputPlaca").value = "";
+        document.getElementById("inputNome").focus();
+    }
+
+    function fecharModalIncluir() {
+        document.getElementById("modalIncluir").classList.remove("active");
+    }
+
+    function incluirLinha() {
+        const unidade = document.getElementById("selectCM").value;
+        const nome = document.getElementById("inputNome").value.trim().toUpperCase();
+        const cpf = document.getElementById("inputCPF").value.trim();
+        const rg = document.getElementById("inputRG").value.trim();
+        const empresa = document.getElementById("inputEmpresa").value.trim().toUpperCase();
+        const telefone = document.getElementById("inputTelefone").value.trim();
+        const placa = document.getElementById("inputPlaca").value.trim().toUpperCase();
+
+        if (!nome) {
+            alert("⚠️ O nome é obrigatório!");
+            return;
+        }
+
+        dados.push([unidade, nome, cpf, rg, empresa, telefone, placa]);
+        fecharModalIncluir();
+        renderizarCheckboxes();
+        renderizarTabela();
+        mostrarToast("✅ Colaborador incluído com sucesso!");
+    }
+
+    // ============================================================
+    // TOAST
+    // ============================================================
+    function mostrarToast(mensagem) {
+        const toast = document.getElementById("toast");
+        toast.textContent = mensagem;
+        toast.classList.add("show");
+        clearTimeout(toast._timer);
+        toast._timer = setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+
+    // ============================================================
+    // INICIALIZAÇÃO
+    // ============================================================
+    renderizarCheckboxes();
+    renderizarTabela();
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            fecharModalIncluir();
+        }
+    });
+</script>
+
+</body>
+</html>
